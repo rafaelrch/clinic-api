@@ -1,8 +1,13 @@
 package com.clinicapi.domain.patient;
 
 import com.clinicapi.domain.person.Person;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "patients")
 public class Patient extends Person {
     private String cpf;
     private LocalDate dateOfBirth;

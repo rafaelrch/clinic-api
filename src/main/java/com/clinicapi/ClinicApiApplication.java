@@ -17,14 +17,6 @@ public class ClinicApiApplication {
 
 		SpringApplication.run(ClinicApiApplication.class, args);
 
-		Doctor doctor = new Doctor("Dr Leopoldo", "leopoldo@gmail.com", "719994827452", "Doctoralia", NEUROLOGY);
-		Patient patient = new Patient("Rafael Rocha", "rafael@gmail.com", "71999682356", "07726098538");
-		Appointment appointment = new Appointment(patient, doctor, LocalDateTime.of(2025, 6, 15, 14, 30));
 
-		System.out.println(doctor);
-		System.out.println(patient);
-		System.out.println(appointment);
 	}
-
-
 }

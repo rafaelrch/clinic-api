@@ -1,7 +1,11 @@
 package com.clinicapi.domain.doctor;
 
 import com.clinicapi.domain.person.Person;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name = "doctors")
 public class Doctor extends Person {
 
     private String crm;

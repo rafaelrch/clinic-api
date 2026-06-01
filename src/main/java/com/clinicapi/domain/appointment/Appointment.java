@@ -2,15 +2,23 @@ package com.clinicapi.domain.appointment;
 
 import com.clinicapi.domain.doctor.Doctor;
 import com.clinicapi.domain.patient.Patient;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "appointments")
 public class Appointment {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne
     private Patient patient;
+    @ManyToOne
     private Doctor doctor;
     private LocalDateTime dateTime;
+    @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
 
     public Long getId() {
