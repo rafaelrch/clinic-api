@@ -1,5 +1,6 @@
 package com.clinicapi.domain.patient;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -13,13 +14,17 @@ public class PatientController {
     PatientRepository patientRepository;
 
     @PostMapping
-    public void register(@RequestBody Patient patient) {
+    public void register(@RequestBody @Valid PatientCreateData data) {
+        Patient patient = new Patient(data.name(), data.email(), data.phone(), data.cpf());
         patientRepository.save(patient);
     }
 
     @GetMapping
-    public List<Patient> list(){
-        return patientRepository.findAll();
+    public List<PatientResponseData> list(){
+        return patientRepository.findAll()
+                .stream()
+                .map(PatientResponseData::new)
+                .toList();
     }
 
     @PutMapping
@@ -29,7 +34,6 @@ public class PatientController {
         if(data.getName() != null){
             patient.setName(data.getName());
         }
-
 
         if(data.getPhone() != null){
             patient.setPhone(data.getPhone());

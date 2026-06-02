@@ -1,6 +1,7 @@
 package com.clinicapi.domain.doctor;
 
 import com.clinicapi.domain.patient.Patient;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -15,13 +16,17 @@ public class DoctorController {
     DoctorRepository doctorRepository;
 
     @PostMapping
-    public void register(@RequestBody Doctor doctor) {
+    public void register(@RequestBody @Valid DoctorCreateData data) {
+        Doctor doctor = new Doctor(data.name(), data.email(), data.phone(), data.crm(), data.specialty());
         doctorRepository.save(doctor);
     }
 
     @GetMapping
-    public List<Doctor> list(){
-        return doctorRepository.findAll();
+    public List<DoctorResponseData> list(){
+        return doctorRepository.findAll()
+                .stream()
+                .map(DoctorResponseData::new)
+                .toList();
     }
 
     @PutMapping
