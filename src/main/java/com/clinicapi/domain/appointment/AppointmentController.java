@@ -4,6 +4,7 @@ import com.clinicapi.domain.doctor.Doctor;
 import com.clinicapi.domain.doctor.DoctorRepository;
 import com.clinicapi.domain.patient.Patient;
 import com.clinicapi.domain.patient.PatientRepository;
+import com.clinicapi.domain.service.AppointmentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,45 +17,31 @@ import java.util.List;
 public class AppointmentController {
 
     @Autowired
-    AppointmentRepository appointmentRepository;
-
-    @Autowired
-    PatientRepository patientRepository;
-
-    @Autowired
-    DoctorRepository doctorRepository;
+    AppointmentService service;
 
     @PostMapping
     public void register(@RequestBody @Valid AppointmentCreateData data) {
-
-        Patient patient = patientRepository.getReferenceById(data.patientId());
-        Doctor doctor = doctorRepository.getReferenceById(data.doctorId());
-
-        Appointment appointment = new Appointment(patient, doctor, data.dateTime());
-        appointmentRepository.save(appointment);
+        service.register(data);
     }
 
     @GetMapping
     public List<AppointmentResponseData> list(){
-        return appointmentRepository.findAll()
-                .stream()
-                .map(AppointmentResponseData::new)
-                .toList();
+        return service.list();
     }
 
-    @PutMapping
-    @Transactional
-    public void update(@RequestBody AppointmentUpdateData data){
-        Appointment appointment = appointmentRepository.getReferenceById(data.getId());
-        if(data.getDateTime() != null){
-            appointment.setDateTime(data.getDateTime());
-        }
+    @GetMapping("/{id}")
+    public AppointmentResponseData findById(@PathVariable Long id){
+        return service.findById(id);
+    }
+
+    @PutMapping("/{id}")
+    public void update(@PathVariable Long id, @RequestBody AppointmentUpdateData data){
+        service.update(id, data);
     }
 
     @DeleteMapping("/{id}")
-    @Transactional
     public void delete(@PathVariable Long id){
-        appointmentRepository.deleteById(id);
+        service.delete(id);
     }
 
 }
