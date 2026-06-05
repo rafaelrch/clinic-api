@@ -12,6 +12,7 @@ public class Doctor extends Person {
     private Specialty specialty;
     private Boolean active;
 
+
     public String getCrm() {
         return crm;
     }
@@ -39,7 +40,7 @@ public class Doctor extends Person {
     public Doctor() {
     }
 
-    public Doctor(String name, String email, String phone, String crm, Specialty specialty) {
+    public Doctor(String name, String email, String phone, String crm, Specialty specialty, Boolean active) {
         super(name, email, phone);
         this.crm = crm;
         this.specialty = specialty;

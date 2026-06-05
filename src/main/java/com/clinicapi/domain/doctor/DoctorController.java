@@ -1,6 +1,7 @@
 package com.clinicapi.domain.doctor;
 
 import com.clinicapi.domain.patient.Patient;
+import com.clinicapi.domain.service.DoctorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,42 +14,29 @@ import java.util.List;
 public class DoctorController {
 
     @Autowired
-    DoctorRepository doctorRepository;
+    DoctorService service;
 
     @PostMapping
     public void register(@RequestBody @Valid DoctorCreateData data) {
-        Doctor doctor = new Doctor(data.name(), data.email(), data.phone(), data.crm(), data.specialty());
-        doctorRepository.save(doctor);
+        service.register(data);
     }
 
     @GetMapping
     public List<DoctorResponseData> list(){
-        return doctorRepository.findAll()
-                .stream()
-                .map(DoctorResponseData::new)
-                .toList();
+        return service.list();
+    }
+    @GetMapping(value = "/{id}")
+    public DoctorResponseData findById(@PathVariable Long id){
+        return service.findById(id);
     }
 
-    @PutMapping
-    @Transactional
-    public void update(@RequestBody DoctorUpdateData data){
-        Doctor doctor = doctorRepository.getReferenceById(data.getId());
-        if(data.getName() != null){
-            doctor.setName(data.getName());
-        }
-
-        if(data.getSpecialty() != null){
-            doctor.setSpecialty(data.getSpecialty());
-        }
-
-        if(data.getPhone() != null){
-            doctor.setPhone(data.getPhone());
-        }
+    @PutMapping(value = "/{id}")
+    public void update(@PathVariable Long id, @RequestBody DoctorUpdateData data){
+        service.update(id, data);
     }
 
     @DeleteMapping("/{id}")
-    @Transactional
     public void delete(@PathVariable Long id){
-        doctorRepository.deleteById(id);
+        service.delete(id);
     }
 }

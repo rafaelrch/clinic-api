@@ -2,14 +2,9 @@ package com.clinicapi.domain.doctor;
 
 public class DoctorUpdateData {
 
-    private Long id;
     private String name;
     private String phone;
     private Specialty specialty;
-
-    public Long getId() {
-        return id;
-    }
 
     public String getName() {
         return name;
@@ -22,4 +17,5 @@ public class DoctorUpdateData {
     public Specialty getSpecialty() {
         return specialty;
     }
+
 }

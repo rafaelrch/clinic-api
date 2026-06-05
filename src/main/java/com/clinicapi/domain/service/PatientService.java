@@ -48,6 +48,7 @@ public class PatientService {
 
     @Transactional
     public void delete(Long id){
+        Patient patient = patientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
         patientRepository.deleteById(id);
     }
 }
