@@ -4,6 +4,7 @@ import com.clinicapi.domain.appointment.*;
 import com.clinicapi.domain.doctor.*;
 import com.clinicapi.domain.patient.Patient;
 import com.clinicapi.domain.patient.PatientRepository;
+import com.clinicapi.domain.service.exceptions.BusinessRuleException;
 import com.clinicapi.domain.service.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,8 +31,16 @@ public class AppointmentService {
 
         Doctor doctor = doctorRepository.findById(data.doctorId()).orElseThrow(() -> new ResourceNotFoundException(data.doctorId()));
 
-        if (!doctor.getActive()){
-            throw new RuntimeException("Doctor is not active");
+        if (doctor.getActive() == null || !doctor.getActive()){
+            throw new BusinessRuleException("Doctor is not active");
+        }
+
+        if(appointmentRepository.existsByDoctorIdAndDateTime(doctor.getId(), data.dateTime())) {
+            throw new BusinessRuleException("Doctor already has an appointment at this time");
+        }
+
+        if(appointmentRepository.existsByPatientIdAndDateTime(patient.getId(), data.dateTime())){
+            throw new BusinessRuleException("Patient already has an appointment at this time");
         }
 
         Appointment appointment = new Appointment(patient, doctor, data.dateTime());

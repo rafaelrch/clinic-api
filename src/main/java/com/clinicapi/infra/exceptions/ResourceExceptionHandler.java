@@ -1,5 +1,6 @@
 package com.clinicapi.infra.exceptions;
 
+import com.clinicapi.domain.service.exceptions.BusinessRuleException;
 import com.clinicapi.domain.service.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,15 @@ public class ResourceExceptionHandler {
         StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
 
         return ResponseEntity.status(status).body(err);
+     }
+
+     @ExceptionHandler(BusinessRuleException.class)
+     public ResponseEntity<StandardError> businessRule(BusinessRuleException e, HttpServletRequest request){
+         String error = "Business rule violation";
+         HttpStatus status = HttpStatus.BAD_REQUEST;
+         StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+
+         return ResponseEntity.status(status).body(err);
      }
 
 }
