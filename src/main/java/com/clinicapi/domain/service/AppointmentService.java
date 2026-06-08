@@ -7,10 +7,12 @@ import com.clinicapi.domain.patient.PatientRepository;
 import com.clinicapi.domain.service.exceptions.BusinessRuleException;
 import com.clinicapi.domain.service.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -48,11 +50,9 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
     }
 
-    public List<AppointmentResponseData> list(){
-        return appointmentRepository.findAll()
-                .stream()
-                .map(AppointmentResponseData::new)
-                .toList();
+    public Page<AppointmentResponseData> list(Pageable pageable){
+        return appointmentRepository.findAll(pageable)
+                .map(AppointmentResponseData::new);
     }
 
     public AppointmentResponseData findById(Long id){
@@ -66,13 +66,31 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
         if(data.getDateTime() != null){
-            appointment.setDateTime(data.getDateTime());
+            LocalDateTime newDateTime = data.getDateTime();
+            boolean doctorHasConflict = appointmentRepository.existsByDoctorIdAndDateTimeAndIdNot(appointment.getDoctor().getId(),
+                    newDateTime,
+                    appointment.getId());
+
+            if(doctorHasConflict){
+                throw new BusinessRuleException("Doctor already has an appointment at this time");
+            }
+
+            boolean patientHasConflict = appointmentRepository.existsByPatientIdAndDateTimeAndIdNot(appointment.getPatient().getId(),
+                    newDateTime,
+                    appointment.getId());
+
+            if(patientHasConflict){
+                throw new BusinessRuleException("Patient already has an appointment at this time");
+            }
+
+            appointment.setDateTime(newDateTime);
         }
+
     }
 
     @Transactional
     public void delete(Long id){
-        Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        appointmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
         appointmentRepository.deleteById(id);
     }
 }
