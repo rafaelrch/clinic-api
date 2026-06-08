@@ -3,6 +3,8 @@ package com.clinicapi.domain.service;
 import com.clinicapi.domain.doctor.*;
 import com.clinicapi.domain.service.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,11 +21,9 @@ public class DoctorService {
         doctorRepository.save(doctor);
     }
 
-    public List<DoctorResponseData> list(){
-        return doctorRepository.findAllByActiveTrue()
-                .stream()
-                .map(DoctorResponseData::new)
-                .toList();
+    public Page<DoctorResponseData> list(Pageable pageable){
+        return doctorRepository.findAllByActiveTrue(pageable)
+                .map(DoctorResponseData::new);
     }
 
     public DoctorResponseData findById(Long id){

@@ -1,13 +1,11 @@
 package com.clinicapi.domain.doctor;
 
-import com.clinicapi.domain.patient.Patient;
 import com.clinicapi.domain.service.DoctorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/doctors")
@@ -22,8 +20,8 @@ public class DoctorController {
     }
 
     @GetMapping
-    public List<DoctorResponseData> list(){
-        return service.list();
+    public Page<DoctorResponseData> list(Pageable pageable){
+        return service.list(pageable);
     }
     @GetMapping(value = "/{id}")
     public DoctorResponseData findById(@PathVariable Long id){
