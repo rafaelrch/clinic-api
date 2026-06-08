@@ -3,10 +3,10 @@ package com.clinicapi.domain.service;
 import com.clinicapi.domain.patient.*;
 import com.clinicapi.domain.service.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,11 +21,9 @@ public class PatientService {
         patientRepository.save(patient);
     }
 
-    public List<PatientResponseData> list(){
-        return patientRepository.findAll()
-                .stream()
-                .map(PatientResponseData::new)
-                .toList();
+    public Page<PatientResponseData> list(Pageable pageable){
+        return patientRepository.findAll(pageable)
+                .map(PatientResponseData::new);
     }
 
     public PatientResponseData findById(Long id){
@@ -36,7 +34,7 @@ public class PatientService {
 
     @Transactional
     public void update(Long id, PatientUpdateData data){
-        Patient patient = patientRepository.getReferenceById(id);
+        Patient patient = patientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
         if(data.getName() != null){
             patient.setName(data.getName());
         }
@@ -48,7 +46,7 @@ public class PatientService {
 
     @Transactional
     public void delete(Long id){
-        Patient patient = patientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        patientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
         patientRepository.deleteById(id);
     }
 }
