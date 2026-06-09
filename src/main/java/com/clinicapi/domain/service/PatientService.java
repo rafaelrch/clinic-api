@@ -16,9 +16,10 @@ public class PatientService {
     PatientRepository patientRepository;
 
     @Transactional
-    public void register(PatientCreateData data) {
+    public PatientResponseData register(PatientCreateData data) {
         Patient patient = new Patient(data.name(), data.email(), data.phone(), data.cpf());
         patientRepository.save(patient);
+        return new PatientResponseData(patient);
     }
 
     public Page<PatientResponseData> list(Pageable pageable){
@@ -33,7 +34,7 @@ public class PatientService {
     }
 
     @Transactional
-    public void update(Long id, PatientUpdateData data){
+    public PatientResponseData update(Long id, PatientUpdateData data){
         Patient patient = patientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
         if(data.getName() != null){
             patient.setName(data.getName());
@@ -42,6 +43,9 @@ public class PatientService {
         if(data.getPhone() != null){
             patient.setPhone(data.getPhone());
         }
+
+        PatientResponseData patientResponseData = new PatientResponseData(patient);
+        return patientResponseData;
     }
 
     @Transactional

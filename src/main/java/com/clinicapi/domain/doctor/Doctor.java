@@ -40,7 +40,7 @@ public class Doctor extends Person {
     public Doctor() {
     }
 
-    public Doctor(String name, String email, String phone, String crm, Specialty specialty, Boolean active) {
+    public Doctor(String name, String email, String phone, String crm, Specialty specialty) {
         super(name, email, phone);
         this.crm = crm;
         this.specialty = specialty;

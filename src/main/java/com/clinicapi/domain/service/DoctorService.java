@@ -17,7 +17,7 @@ public class DoctorService {
     DoctorRepository doctorRepository;
 
     public void register(DoctorCreateData data) {
-        Doctor doctor = new Doctor(data.name(), data.email(), data.phone(), data.crm(), data.specialty(), true);
+        Doctor doctor = new Doctor(data.name(), data.email(), data.phone(), data.crm(), data.specialty());
         doctorRepository.save(doctor);
     }
 

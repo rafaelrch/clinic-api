@@ -5,7 +5,11 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/patients")
@@ -15,8 +19,10 @@ public class PatientController {
     PatientService service;
 
     @PostMapping
-    public void register(@RequestBody @Valid PatientCreateData data) {
-        service.register(data);
+    public ResponseEntity<PatientResponseData> register(@RequestBody @Valid PatientCreateData data, UriComponentsBuilder uriBuilder) {
+        PatientResponseData created = service.register(data);
+        URI uri = uriBuilder.path("/patients/{id}").buildAndExpand(created.id()).toUri();
+        return ResponseEntity.created(uri).body(created);
     }
 
     @GetMapping
@@ -25,18 +31,18 @@ public class PatientController {
     }
 
     @GetMapping(value = "/{id}")
-    public PatientResponseData findById(@PathVariable Long id){
-        PatientResponseData obj = service.findById(id);
-        return obj;
+    public ResponseEntity<PatientResponseData> findById(@PathVariable Long id){
+        return ResponseEntity.ok().body(service.findById(id));
     }
 
     @PutMapping(value = "/{id}")
-    public void update(@PathVariable Long id, @RequestBody @Valid PatientUpdateData data){
-        service.update(id, data);
+    public ResponseEntity<PatientResponseData> update(@PathVariable Long id, @RequestBody @Valid PatientUpdateData data){
+        return ResponseEntity.ok().body(service.update(id, data));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id){
+    public ResponseEntity<Void> delete(@PathVariable Long id){
         service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
