@@ -12,11 +12,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static com.clinicapi.domain.appointment.AppointmentStatus.CONFIRMED;
+import static com.clinicapi.domain.appointment.AppointmentStatus.SCHEDULED;
+
 @Service
 public class AppointmentService {
+
+    private static final AppointmentStatus CANCELED_STATUS = AppointmentStatus.CANCELLED;
 
     @Autowired
     PatientRepository patientRepository;
@@ -37,11 +43,11 @@ public class AppointmentService {
             throw new BusinessRuleException("Doctor is not active");
         }
 
-        if(appointmentRepository.existsByDoctorIdAndDateTime(doctor.getId(), data.dateTime())) {
+        if(appointmentRepository.existsByDoctorIdAndDateTimeAndStatusNot(doctor.getId(), data.dateTime(), CANCELED_STATUS)) {
             throw new BusinessRuleException("Doctor already has an appointment at this time");
         }
 
-        if(appointmentRepository.existsByPatientIdAndDateTime(patient.getId(), data.dateTime())){
+        if(appointmentRepository.existsByPatientIdAndDateTimeAndStatusNot(patient.getId(), data.dateTime(), CANCELED_STATUS)){
             throw new BusinessRuleException("Patient already has an appointment at this time");
         }
 
@@ -67,17 +73,21 @@ public class AppointmentService {
 
         if(data.getDateTime() != null){
             LocalDateTime newDateTime = data.getDateTime();
-            boolean doctorHasConflict = appointmentRepository.existsByDoctorIdAndDateTimeAndIdNot(appointment.getDoctor().getId(),
+            boolean doctorHasConflict = appointmentRepository.existsByDoctorIdAndDateTimeAndIdNotAndStatusNot(appointment.getDoctor().getId(),
                     newDateTime,
-                    appointment.getId());
+                    appointment.getId(),
+                    CANCELED_STATUS
+            );
 
             if(doctorHasConflict){
                 throw new BusinessRuleException("Doctor already has an appointment at this time");
             }
 
-            boolean patientHasConflict = appointmentRepository.existsByPatientIdAndDateTimeAndIdNot(appointment.getPatient().getId(),
+            boolean patientHasConflict = appointmentRepository.existsByPatientIdAndDateTimeAndIdNotAndStatusNot(appointment.getPatient().getId(),
                     newDateTime,
-                    appointment.getId());
+                    appointment.getId(),
+                    CANCELED_STATUS
+            );
 
             if(patientHasConflict){
                 throw new BusinessRuleException("Patient already has an appointment at this time");
@@ -89,8 +99,20 @@ public class AppointmentService {
     }
 
     @Transactional
-    public void delete(Long id){
-        appointmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
-        appointmentRepository.deleteById(id);
+    public void cancel(Long id){
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+
+        if(appointment.getStatus() != SCHEDULED && appointment.getStatus() != CONFIRMED) {
+            throw new BusinessRuleException("Only scheduled or confirmed appointments can be cancelled!");
+        }
+
+        long hours = Duration.between(LocalDateTime.now(), appointment.getDateTime()).toHours();
+
+        if(hours < 24){
+            throw new BusinessRuleException("Appointments must be cancelled at least 24 hours in advance");
+        }
+
+        appointment.setStatus(CANCELED_STATUS);
+
     }
 }

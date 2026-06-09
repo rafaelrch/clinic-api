@@ -35,9 +35,9 @@ public class AppointmentController {
         service.update(id, data);
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id){
-        service.delete(id);
+    @PatchMapping("/{id}/cancel")
+    public void cancel(@PathVariable Long id){
+        service.cancel(id);
     }
 
 }

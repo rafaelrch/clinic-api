@@ -1,7 +1,6 @@
 package com.clinicapi.infra.exceptions;
 
 import com.clinicapi.domain.service.exceptions.BusinessRuleException;
-import com.clinicapi.domain.service.exceptions.MethodArgumentNotValidException;
 import com.clinicapi.domain.service.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
