@@ -16,9 +16,11 @@ public class DoctorService {
     @Autowired
     DoctorRepository doctorRepository;
 
-    public void register(DoctorCreateData data) {
+    @Transactional
+    public DoctorResponseData register(DoctorCreateData data) {
         Doctor doctor = new Doctor(data.name(), data.email(), data.phone(), data.crm(), data.specialty());
         doctorRepository.save(doctor);
+        return new DoctorResponseData(doctor);
     }
 
     public Page<DoctorResponseData> list(Pageable pageable){
@@ -27,13 +29,12 @@ public class DoctorService {
     }
 
     public DoctorResponseData findById(Long id){
-        Optional<Doctor> obj = doctorRepository.findById(id);
-        DoctorResponseData doctor = new DoctorResponseData(obj.orElseThrow(() -> new ResourceNotFoundException(id)));
-        return doctor;
+        Optional<Doctor> obj = doctorRepository.findByIdAndActiveTrue(id);
+        return new DoctorResponseData(obj.orElseThrow(() -> new ResourceNotFoundException(id)));
     }
 
     @Transactional
-    public void update(Long id, DoctorUpdateData data){
+    public DoctorResponseData update(Long id, DoctorUpdateData data){
         Doctor doctor = doctorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
         if(data.getName() != null){
             doctor.setName(data.getName());
@@ -46,6 +47,8 @@ public class DoctorService {
         if(data.getPhone() != null){
             doctor.setPhone(data.getPhone());
         }
+
+        return new DoctorResponseData(doctor);
     }
 
     @Transactional
