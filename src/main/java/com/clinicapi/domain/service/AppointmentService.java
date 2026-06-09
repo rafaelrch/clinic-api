@@ -33,7 +33,8 @@ public class AppointmentService {
     @Autowired
     AppointmentRepository appointmentRepository;
 
-    public void register(AppointmentCreateData data) {
+    @Transactional
+    public AppointmentResponseData register(AppointmentCreateData data) {
 
         Patient patient = patientRepository.findById(data.patientId()).orElseThrow(() -> new ResourceNotFoundException(data.patientId()));
 
@@ -54,6 +55,8 @@ public class AppointmentService {
         Appointment appointment = new Appointment(patient, doctor, data.dateTime());
 
         appointmentRepository.save(appointment);
+
+        return new AppointmentResponseData(appointment);
     }
 
     public Page<AppointmentResponseData> list(Pageable pageable){
@@ -68,7 +71,7 @@ public class AppointmentService {
     }
 
     @Transactional
-    public void update(Long id, AppointmentUpdateData data){
+    public AppointmentResponseData update(Long id, AppointmentUpdateData data){
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
         if(data.getDateTime() != null){
@@ -95,11 +98,11 @@ public class AppointmentService {
 
             appointment.setDateTime(newDateTime);
         }
-
+        return new AppointmentResponseData(appointment);
     }
 
     @Transactional
-    public void cancel(Long id){
+    public AppointmentResponseData cancel(Long id){
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
         if(appointment.getStatus() != SCHEDULED && appointment.getStatus() != CONFIRMED) {
@@ -114,5 +117,6 @@ public class AppointmentService {
 
         appointment.setStatus(CANCELED_STATUS);
 
+        return new AppointmentResponseData(appointment);
     }
 }

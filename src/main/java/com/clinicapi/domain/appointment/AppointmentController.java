@@ -6,7 +6,11 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/appointments")
@@ -16,8 +20,10 @@ public class AppointmentController {
     AppointmentService service;
 
     @PostMapping
-    public void register(@RequestBody @Valid AppointmentCreateData data) {
-        service.register(data);
+    public ResponseEntity<AppointmentResponseData> register(@RequestBody @Valid AppointmentCreateData data, UriComponentsBuilder uriBuilder) {
+        AppointmentResponseData created = service.register(data);
+        URI uri = uriBuilder.path("/appointments/{id}").buildAndExpand(created.id()).toUri();
+        return ResponseEntity.created(uri).body(created);
     }
 
     @GetMapping
@@ -26,18 +32,18 @@ public class AppointmentController {
     }
 
     @GetMapping("/{id}")
-    public AppointmentResponseData findById(@PathVariable Long id){
-        return service.findById(id);
+    public ResponseEntity<AppointmentResponseData> findById(@PathVariable Long id){
+        return ResponseEntity.ok().body(service.findById(id));
     }
 
     @PutMapping("/{id}")
-    public void update(@PathVariable Long id, @RequestBody @Valid AppointmentUpdateData data){
-        service.update(id, data);
+    public ResponseEntity<AppointmentResponseData> update(@PathVariable Long id, @RequestBody @Valid AppointmentUpdateData data){
+        return ResponseEntity.ok().body(service.update(id, data));
     }
 
     @PatchMapping("/{id}/cancel")
-    public void cancel(@PathVariable Long id){
-        service.cancel(id);
+    public ResponseEntity<AppointmentResponseData> cancel(@PathVariable Long id){
+        return ResponseEntity.ok().body(service.cancel(id));
     }
 
 }
