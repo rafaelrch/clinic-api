@@ -2,6 +2,8 @@ package com.clinicapi.domain.doctor;
 
 import com.clinicapi.domain.person.Person;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 @Entity
@@ -9,6 +11,8 @@ import jakarta.persistence.Table;
 public class Doctor extends Person {
 
     private String crm;
+
+    @Enumerated(EnumType.STRING)
     private Specialty specialty;
     private Boolean active;
 
