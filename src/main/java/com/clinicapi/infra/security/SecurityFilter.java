@@ -30,8 +30,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         String tokenJWT = recoverToken(request);
 
         if(tokenJWT != null){
-            String subject = tokenService.getSubject(tokenJWT); //  Validar o token e devolver o login do dono. Se o token for inválido, dispara exception
-
+            String subject = tokenService.getSubject(tokenJWT); //  Validar o token e devolve o login do dono. Se o token for inválido, dispara exception
             // obs: "adicionar handler pra JWTVerificationException retornando 401"
 
             UserDetails user = userRepository.findByLogin(subject); // Busca o usuário no banco. Por isso o UserRepository.findByLogin()
