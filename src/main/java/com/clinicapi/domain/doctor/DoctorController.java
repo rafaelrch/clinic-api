@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -57,6 +58,7 @@ public class DoctorController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete doctor", description = "Deactivates the doctor (soft delete). The record is preserved in the database")
     @ApiResponse(responseCode = "204", description = "Doctor deactivated successfully")
     @ApiResponse(responseCode = "404", description = "Doctor id not found")
