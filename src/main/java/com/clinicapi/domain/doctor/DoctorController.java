@@ -25,6 +25,7 @@ public class DoctorController {
     DoctorService service;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Register doctor", description = "Registers a new doctor and returns the created resource")
     @ApiResponse(responseCode = "201", description = "Doctor registered successfully")
     @ApiResponse(responseCode = "400", description = "Validation failed! One or more fields are invalid")
@@ -35,12 +36,15 @@ public class DoctorController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'PATIENT')")
     @Operation(summary = "List all doctors", description = "Returns a paginated list of registered doctors active")
     @ApiResponse(responseCode = "200", description = "Doctors listed successfully")
     public Page<DoctorResponseData> list(@ParameterObject Pageable pageable){
         return service.list(pageable);
     }
+
     @GetMapping(value = "/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PATIENT')")
     @Operation(summary = "Find doctor by ID", description = "Returns the doctor with the given ID")
     @ApiResponse(responseCode = "200", description = "Doctor id found successfully")
     @ApiResponse(responseCode = "404", description = "Doctor id not found or inactive")
@@ -49,6 +53,7 @@ public class DoctorController {
     }
 
     @PutMapping(value = "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update doctor", description = "Updates the doctor data. Only provided fields are updated")
     @ApiResponse(responseCode = "200", description = "Doctor updated successfully")
     @ApiResponse(responseCode = "400", description = "Validation failed! One or more fields are invalid")

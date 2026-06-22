@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -26,6 +27,7 @@ public class AppointmentController {
     AppointmentService service;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'PATIENT')")
     @Operation(summary = "Register appointment", description = "Registers a new appointment and returns the created resource")
     @ApiResponse(responseCode = "201", description = "Appointment registered successfully")
     @ApiResponse(responseCode = "400", description = "Business rule violation: doctor inactive, scheduling conflict, or invalid date")
@@ -36,6 +38,7 @@ public class AppointmentController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @Operation(summary = "List all appointments", description = "Returns a paginated list of registered appointments")
     @ApiResponse(responseCode = "200", description = "Appointments listed successfully")
     public Page<AppointmentResponseData> list(@ParameterObject Pageable pageable){
@@ -43,6 +46,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @Operation(summary = "Find appointment by ID", description = "Returns the appointment with the given ID")
     @ApiResponse(responseCode = "200", description = "Appointment id found successfully")
     @ApiResponse(responseCode = "404", description = "Appointment id not found")
@@ -51,6 +55,7 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update appointment", description = "Updates the appointment date")
     @ApiResponse(responseCode = "200", description = "Appointment updated successfully")
     @ApiResponse(responseCode = "400", description = "Scheduling conflict: doctor or patient already has an appointment at this time")
@@ -60,6 +65,7 @@ public class AppointmentController {
     }
 
     @PatchMapping("/{id}/cancel")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PATIENT')")
     @Operation(summary = "Cancel appointment", description = "Changes the appointment status to CANCELLED and returns the updated resource")
     @ApiResponse(responseCode = "200", description = "Appointment cancelled successfully, returns the updated appointment with CANCELLED status")
     @ApiResponse(responseCode = "400", description = "Just SCHEDULED or CONFIRMED status can be changed")

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -24,6 +25,7 @@ public class PatientController {
     PatientService service;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Register patient", description = "Registers a new patient and returns the created resource")
     @ApiResponse(responseCode = "201", description = "Patients registered successfully")
     @ApiResponse(responseCode = "400", description = "Validation failed! One or more fields are invalid")
@@ -34,6 +36,7 @@ public class PatientController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @Operation(summary = "List all patients", description = "Returns a paginated list of registered patients")
     @ApiResponse(responseCode = "200", description = "Patients listed successfully")
     public Page<PatientResponseData> list(@ParameterObject Pageable pageable){
@@ -41,6 +44,7 @@ public class PatientController {
     }
 
     @GetMapping(value = "/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @Operation(summary = "Find patient by ID", description = "Returns the patient with the given ID")
     @ApiResponse(responseCode = "200", description = "Patient id listed successfully")
     @ApiResponse(responseCode = "404", description = "Patient id not found")
@@ -49,6 +53,7 @@ public class PatientController {
     }
 
     @PutMapping(value = "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update patient", description = "Updates the patient data. Only provided fields are updated")
     @ApiResponse(responseCode = "200", description = "Patient updated successfully")
     @ApiResponse(responseCode = "400", description = "Validation failed! One or more fields are invalid")
@@ -58,6 +63,7 @@ public class PatientController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete patient", description = "Permanently deletes the patient from the database")
     @ApiResponse(responseCode = "204", description = "Patient deleted successfully")
     @ApiResponse(responseCode = "404", description = "Patient id not found")
