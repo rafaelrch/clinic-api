@@ -1,4 +1,4 @@
-package com.clinicapi.clinicapi;
+package com.clinicapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
