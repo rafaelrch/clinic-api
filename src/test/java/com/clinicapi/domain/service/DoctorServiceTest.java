@@ -11,10 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +28,7 @@ class DoctorServiceTest {
     private DoctorService service;
 
     @Test
-    @DisplayName("Should return Doctor when Doctor exists and is active")
+    @DisplayName("Should throw ResourceNotFoundException when doctor does not exist or is inactive")
     void shouldReturnDoctorResponseDataWhenDoctorExists(){
 
         // ARRANGE
@@ -56,6 +56,36 @@ class DoctorServiceTest {
 
         // ACT & ASSERT
         assertThatThrownBy(() -> service.findById(99L))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("99");
+    }
+
+    @Test
+    @DisplayName("Should deactive doctor when doctor exists")
+    void shouldDeactivateDoctorWhenDoctorExists(){
+
+        //ARRANGE
+        Doctor doctor = new Doctor("Dr. Test 2", "test2@email.com", "11999999999", "CRM123", Specialty.PEDIATRICS);
+        when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
+
+        //ACT
+        service.delete(1L);
+
+        //ASSERT
+        assertThat(doctor.getActive()).isFalse();
+        verify(doctorRepository).findById(1L);
+
+    }
+
+    @Test
+    @DisplayName("Should throw ResourceNotFoundException when trying to delete non existent doctor")
+    void shouldThrowResourceNotFoundExceptionWhenTryingToDeleteNonExistentDoctor(){
+
+        //ARRANGE
+        when(doctorRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // ACT & ASSERT
+        assertThatThrownBy(() -> service.delete(99L))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("99");
     }
