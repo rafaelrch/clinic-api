@@ -1,13 +1,12 @@
 package com.clinicapi.domain.service;
 
-import com.clinicapi.domain.doctor.Doctor;
-import com.clinicapi.domain.doctor.DoctorRepository;
-import com.clinicapi.domain.doctor.DoctorResponseData;
-import com.clinicapi.domain.doctor.Specialty;
+import com.clinicapi.domain.doctor.*;
 import com.clinicapi.domain.service.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,8 +26,11 @@ class DoctorServiceTest {
     @InjectMocks
     private DoctorService service;
 
+    @Captor
+    private ArgumentCaptor<Doctor> doctorCaptor;
+
     @Test
-    @DisplayName("Should throw ResourceNotFoundException when doctor does not exist or is inactive")
+    @DisplayName("Should return DoctorResponseData when doctor exists and is active")
     void shouldReturnDoctorResponseDataWhenDoctorExists(){
 
         // ARRANGE
@@ -48,7 +50,7 @@ class DoctorServiceTest {
     }
 
     @Test
-    @DisplayName("Should return empty when throw Resource Not Found Exception when doctor does not exist")
+    @DisplayName("Should throw ResourceNotFoundException when doctor does not exist or is inactive")
     void shouldThrowResourceNotFoundExceptionWhenDoctorDoesNotExist(){
 
         //ARRANGE
@@ -61,7 +63,7 @@ class DoctorServiceTest {
     }
 
     @Test
-    @DisplayName("Should deactive doctor when doctor exists")
+    @DisplayName("Should deactivate doctor when doctor exists")
     void shouldDeactivateDoctorWhenDoctorExists(){
 
         //ARRANGE
@@ -88,6 +90,34 @@ class DoctorServiceTest {
         assertThatThrownBy(() -> service.delete(99L))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("99");
+    }
+
+    @Test
+    @DisplayName("Should register a doctor when data is valid")
+    void shouldRegisterDoctorWhenDataIsValid(){
+
+        //ARRANGE
+        DoctorCreateData data = new DoctorCreateData("Dr. Test", "test@gmail.com", "11999999999", "CRM123", Specialty.PEDIATRICS);
+
+        //ACT
+        DoctorResponseData result = service.register(data);
+
+        //ASSERTS
+        verify(doctorRepository).save(doctorCaptor.capture());
+        Doctor captured = doctorCaptor.getValue();
+
+        assertThat(result).isNotNull();
+        assertThat(result.name()).isEqualTo("Dr. Test");
+        assertThat(result.email()).isEqualTo("test@gmail.com");
+        assertThat(result.crm()).isEqualTo("CRM123");
+        assertThat(result.specialty()).isEqualTo(Specialty.PEDIATRICS);
+
+        assertThat(captured).isNotNull();
+        assertThat(captured.getName()).isEqualTo("Dr. Test");
+        assertThat(captured.getEmail()).isEqualTo("test@gmail.com");
+        assertThat(captured.getCrm()).isEqualTo("CRM123");
+        assertThat(captured.getSpecialty()).isEqualTo(Specialty.PEDIATRICS);
+        assertThat(captured.getActive()).isTrue();
     }
 
 
