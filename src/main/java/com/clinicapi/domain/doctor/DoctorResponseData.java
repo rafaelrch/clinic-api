@@ -13,6 +13,9 @@ public record DoctorResponseData(
         @Schema(description = "Doctor email address", example = "leopoldo@gmail.com", accessMode = Schema.AccessMode.READ_ONLY)
         String email,
 
+        @Schema(description = "Doctor phone", example = "71999384756", accessMode = Schema.AccessMode.READ_ONLY)
+        String phone,
+
         @Schema(description = "Doctor CRM used", example = "Doctoralia", accessMode = Schema.AccessMode.READ_ONLY)
         String crm,
 
@@ -24,7 +27,7 @@ public record DoctorResponseData(
 
 
     public DoctorResponseData(Doctor doctor){
-        this(doctor.getId(), doctor.getName(), doctor.getEmail(), doctor.getCrm(), doctor.getSpecialty(), doctor.getActive());
+        this(doctor.getId(), doctor.getName(), doctor.getEmail(), doctor.getPhone(), doctor.getCrm(), doctor.getSpecialty(), doctor.getActive());
     }
 
 }
