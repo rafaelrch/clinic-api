@@ -16,4 +16,8 @@ public class AppointmentUpdateData {
     public LocalDateTime getDateTime() {
         return dateTime;
     }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
 }

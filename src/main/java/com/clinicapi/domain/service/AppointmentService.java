@@ -76,7 +76,8 @@ public class AppointmentService {
 
         if(data.getDateTime() != null){
             LocalDateTime newDateTime = data.getDateTime();
-            boolean doctorHasConflict = appointmentRepository.existsByDoctorIdAndDateTimeAndIdNotAndStatusNot(appointment.getDoctor().getId(),
+            boolean doctorHasConflict = appointmentRepository.existsByDoctorIdAndDateTimeAndIdNotAndStatusNot(
+                    appointment.getDoctor().getId(),
                     newDateTime,
                     appointment.getId(),
                     CANCELED_STATUS

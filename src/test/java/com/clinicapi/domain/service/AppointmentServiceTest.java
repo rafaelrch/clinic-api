@@ -1,9 +1,6 @@
 package com.clinicapi.domain.service;
 
-import com.clinicapi.domain.appointment.Appointment;
-import com.clinicapi.domain.appointment.AppointmentCreateData;
-import com.clinicapi.domain.appointment.AppointmentRepository;
-import com.clinicapi.domain.appointment.AppointmentResponseData;
+import com.clinicapi.domain.appointment.*;
 import com.clinicapi.domain.doctor.Doctor;
 import com.clinicapi.domain.doctor.DoctorRepository;
 import com.clinicapi.domain.doctor.Specialty;
@@ -194,6 +191,88 @@ class AppointmentServiceTest {
         assertThat(result.doctorName()).isEqualTo("Dr. Test");
         assertThat(result.status()).isEqualTo(SCHEDULED);
         assertThat(result.dateTime()).isEqualTo(dataFixa);
+    }
 
+    @Test
+    @DisplayName("Should Update appointment when data is valid")
+    void shouldUpdateAppointmentWhenDataIsValid(){
+        //ARRANGE
+        Patient patient = new Patient("Joao Silva", "joao@email.com", "11000000", "0339485769");
+        Doctor doctor = new Doctor("Dr. Test", "test@email.com", "11999999999", "CRM123", Specialty.PEDIATRICS);
+        LocalDateTime dataFixa = LocalDateTime.of(2036, 7, 10, 14, 0, 0);
+        Appointment appointment = new Appointment(patient, doctor, dataFixa);
+
+        AppointmentUpdateData data = new AppointmentUpdateData();
+        LocalDateTime novaData = LocalDateTime.of(2036, 8, 11, 14, 0, 0);
+        data.setDateTime(novaData);
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
+
+        //ACT
+        AppointmentResponseData result = service.update(1L, data);
+
+        //ASSERT
+        verify(appointmentRepository, never()).save(any(Appointment.class));
+        assertThat(result.dateTime()).isEqualTo(novaData);
+        assertThat(appointment.getDoctor().getName()).isEqualTo("Dr. Test");
+        assertThat(appointment.getPatient().getName()).isEqualTo("Joao Silva");
+        assertThat(appointment.getDateTime()).isEqualTo(novaData);
+    }
+
+    @Test
+    @DisplayName("Should Throw BusinessRuleException When Doctor Has Conflict On Update")
+    void shouldThrowBusinessRuleExceptionWhenDoctorHasConflictOnUpdate(){
+        //ARRANGE
+        Patient patient = new Patient("Joao Silva", "joao@email.com", "11000000", "0339485769");
+        Doctor doctor = new Doctor("Dr. Test", "test@email.com", "11999999999", "CRM123", Specialty.PEDIATRICS);
+        LocalDateTime dataFixa = LocalDateTime.of(2036, 7, 10, 14, 0, 0);
+        Appointment appointment = new Appointment(patient, doctor, dataFixa);
+
+        AppointmentUpdateData data = new AppointmentUpdateData();
+        LocalDateTime novaData = LocalDateTime.of(2036, 8, 11, 14, 0, 0);
+        data.setDateTime(novaData);
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
+        when(appointmentRepository.existsByDoctorIdAndDateTimeAndIdNotAndStatusNot(any(), any(), any(), any())).thenReturn(true);
+
+        //ACT & ASSERT
+        assertThatThrownBy(() -> service.update(1L, data))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("Doctor already has an appointment at this time");
+        verify(appointmentRepository, never()).save(any(Appointment.class));
+    }
+
+    @Test
+    @DisplayName("Should Throw BusinessRuleException When Patient Has Conflict On Update")
+    void shouldThrowBusinessRuleExceptionWhenPatientHasConflictOnUpdate(){
+        //ARRANGE
+        Patient patient = new Patient("Joao Silva", "joao@email.com", "11000000", "0339485769");
+        Doctor doctor = new Doctor("Dr. Test", "test@email.com", "11999999999", "CRM123", Specialty.PEDIATRICS);
+        LocalDateTime dataFixa = LocalDateTime.of(2036, 7, 10, 14, 0, 0);
+        Appointment appointment = new Appointment(patient, doctor, dataFixa);
+
+        AppointmentUpdateData data = new AppointmentUpdateData();
+        LocalDateTime novaData = LocalDateTime.of(2036, 8, 11, 14, 0, 0);
+        data.setDateTime(novaData);
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
+        when(appointmentRepository.existsByPatientIdAndDateTimeAndIdNotAndStatusNot(any(), any(), any(), any())).thenReturn(true);
+
+        //ACT & ASSERT
+        assertThatThrownBy(() -> service.update(1L, data))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("Patient already has an appointment at this time");
+        verify(appointmentRepository, never()).save(any(Appointment.class));
+    }
+
+    @Test
+    @DisplayName("Should Throw ResourceNotFoundException When Update Appointment Not Exist")
+    void shouldThrowResourceNotFoundExceptionWhenUpdateAppointmentNotExist(){
+        //ARRANGE
+        AppointmentUpdateData data = new AppointmentUpdateData();
+        when(appointmentRepository.findById(99L)).thenReturn(Optional.empty());
+
+        //ACT & ASSERT
+        assertThatThrownBy(() -> service.update(99L, data))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("99");
+        verify(appointmentRepository, never()).save(any(Appointment.class));
     }
 }
