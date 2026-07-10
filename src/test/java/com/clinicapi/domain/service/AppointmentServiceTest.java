@@ -275,4 +275,68 @@ class AppointmentServiceTest {
                 .hasMessageContaining("99");
         verify(appointmentRepository, never()).save(any(Appointment.class));
     }
+
+    @Test
+    @DisplayName("Should Cancel Appointment When Data Is Valid")
+    void shouldCancelAppointmentWhenDataIsValid(){
+        //ARRANGE
+        Patient patient = new Patient("Joao Silva", "joao@email.com", "11000000", "0339485769");
+        Doctor doctor = new Doctor("Dr. Test", "test@email.com", "11999999999", "CRM123", Specialty.PEDIATRICS);
+        Appointment appointment = new Appointment(patient, doctor, LocalDateTime.now().plusDays(2));
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
+
+        //ACT
+        AppointmentResponseData result = service.cancel(1L);
+
+        //ASSERT
+        verify(appointmentRepository, never()).save(any(Appointment.class));
+        assertThat(appointment.getStatus()).isEqualTo(AppointmentStatus.CANCELLED);
+        assertThat(result.status()).isEqualTo(AppointmentStatus.CANCELLED);
+    }
+
+    @Test
+    @DisplayName("Should Throw BusinessRuleException When Appointment Status Is Invalid")
+    void shouldThrowBusinessRuleExceptionWhenAppointmentStatusIsInvalid(){
+        //ARRANGE
+        Patient patient = new Patient("Joao Silva", "joao@email.com", "11000000", "0339485769");
+        Doctor doctor = new Doctor("Dr. Test", "test@email.com", "11999999999", "CRM123", Specialty.PEDIATRICS);
+        Appointment appointment = new Appointment(patient, doctor, LocalDateTime.now().plusDays(2));
+        appointment.setStatus(AppointmentStatus.COMPLETED);
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
+
+        //ACT & ASSERT
+        assertThatThrownBy(() -> service.cancel(1L))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("Only scheduled or confirmed appointments can be cancelled!");
+        verify(appointmentRepository, never()).save(any(Appointment.class));
+    }
+
+    @Test
+    @DisplayName("Should Throw BusinessRuleException When Cancellation Is Less Than 24 Hours In Advance")
+    void shouldThrowBusinessRuleExceptionWhenCancellationIsLessThan24HoursInAdvance(){
+        //ARRANGE
+        Patient patient = new Patient("Joao Silva", "joao@email.com", "11000000", "0339485769");
+        Doctor doctor = new Doctor("Dr. Test", "test@email.com", "11999999999", "CRM123", Specialty.PEDIATRICS);
+        Appointment appointment = new Appointment(patient, doctor, LocalDateTime.now().plusHours(20));
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
+
+        //ACT & ASSERT
+        assertThatThrownBy(() -> service.cancel(1L))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("Appointments must be cancelled at least 24 hours in advance");
+        verify(appointmentRepository, never()).save(any(Appointment.class));
+    }
+
+    @Test
+    @DisplayName("Should Throw ResourceNotFoundException When Cancel Appointment Not Exist")
+    void shouldThrowResourceNotFoundExceptionWhenCancelAppointmentNotExist(){
+        //ARRANGE
+        when(appointmentRepository.findById(99L)).thenReturn(Optional.empty());
+
+        //ACT & ASSERT
+        assertThatThrownBy(() -> service.cancel(99L))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("99");
+        verify(appointmentRepository, never()).save(any(Appointment.class));
+    }
 }
