@@ -277,6 +277,28 @@ class AppointmentServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw BusinessRuleException when updating a cancelled appointment")
+    void shouldThrowBusinessRuleExceptionWhenUpdatingACancelledAppointment(){
+        //ARRANGE
+        Patient patient = new Patient("Joao Silva", "joao@email.com", "11000000", "0339485769");
+        Doctor doctor = new Doctor("Dr. Test", "test@email.com", "11999999999", "CRM123", Specialty.PEDIATRICS);
+        LocalDateTime dataFixa = LocalDateTime.of(2036, 7, 10, 14, 0, 0);
+        Appointment appointment = new Appointment(patient, doctor, dataFixa);
+        appointment.setStatus(AppointmentStatus.CANCELLED);
+
+        AppointmentUpdateData data = new AppointmentUpdateData();
+        data.setDateTime(LocalDateTime.of(2036, 8, 11, 14, 0, 0));
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
+
+        //ACT & ASSERT
+        assertThatThrownBy(() -> service.update(1L, data))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("Only scheduled or confirmed appointments can be rescheduled");
+        assertThat(appointment.getDateTime()).isEqualTo(dataFixa);
+        verify(appointmentRepository, never()).save(any(Appointment.class));
+    }
+
+    @Test
     @DisplayName("Should Cancel Appointment When Data Is Valid")
     void shouldCancelAppointmentWhenDataIsValid(){
         //ARRANGE

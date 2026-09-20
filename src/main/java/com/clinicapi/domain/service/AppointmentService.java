@@ -74,6 +74,10 @@ public class AppointmentService {
     public AppointmentResponseData update(Long id, AppointmentUpdateData data){
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
+        if(appointment.getStatus() != SCHEDULED && appointment.getStatus() != CONFIRMED) {
+            throw new BusinessRuleException("Only scheduled or confirmed appointments can be rescheduled");
+        }
+
         if(data.getDateTime() != null){
             LocalDateTime newDateTime = data.getDateTime();
             boolean doctorHasConflict = appointmentRepository.existsByDoctorIdAndDateTimeAndIdNotAndStatusNot(
