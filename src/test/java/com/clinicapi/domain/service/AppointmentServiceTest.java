@@ -277,7 +277,7 @@ class AppointmentServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw BusinessRuleException when updating a cancelled appointment")
+    @DisplayName("Should Throw BusinessRuleException When Updating A Cancelled Appointment")
     void shouldThrowBusinessRuleExceptionWhenUpdatingACancelledAppointment(){
         //ARRANGE
         Patient patient = new Patient("Joao Silva", "joao@email.com", "11000000", "0339485769");
