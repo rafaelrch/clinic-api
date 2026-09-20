@@ -35,7 +35,7 @@ public class DoctorService {
 
     @Transactional
     public DoctorResponseData update(Long id, DoctorUpdateData data){
-        Doctor doctor = doctorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        Doctor doctor = doctorRepository.findByIdAndActiveTrue(id).orElseThrow(() -> new ResourceNotFoundException(id));
         if(data.getName() != null){
             doctor.setName(data.getName());
         }
@@ -53,7 +53,7 @@ public class DoctorService {
 
     @Transactional
     public void delete(Long id){
-        Doctor doctor = doctorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+        Doctor doctor = doctorRepository.findByIdAndActiveTrue(id).orElseThrow(() -> new ResourceNotFoundException(id));
         doctor.setActive(false);
     }
 }

@@ -62,28 +62,28 @@ class DoctorServiceTest {
     }
 
     @Test
-    @DisplayName("Should deactivate doctor when doctor exists")
+    @DisplayName("Should deactivate doctor when doctor exists and is active")
     void shouldDeactivateDoctorWhenDoctorExists(){
 
         //ARRANGE
         Doctor doctor = new Doctor("Dr. Test 2", "test2@email.com", "11999999999", "CRM123", Specialty.PEDIATRICS);
-        when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
+        when(doctorRepository.findByIdAndActiveTrue(1L)).thenReturn(Optional.of(doctor));
 
         //ACT
         service.delete(1L);
 
         //ASSERT
         assertThat(doctor.getActive()).isFalse();
-        verify(doctorRepository).findById(1L);
+        verify(doctorRepository).findByIdAndActiveTrue(1L);
 
     }
 
     @Test
-    @DisplayName("Should throw ResourceNotFoundException when trying to delete non existent doctor")
+    @DisplayName("Should throw ResourceNotFoundException when trying to delete non existent or inactive doctor")
     void shouldThrowResourceNotFoundExceptionWhenTryingToDeleteNonExistentDoctor(){
 
         //ARRANGE
-        when(doctorRepository.findById(99L)).thenReturn(Optional.empty());
+        when(doctorRepository.findByIdAndActiveTrue(99L)).thenReturn(Optional.empty());
 
         // ACT & ASSERT
         assertThatThrownBy(() -> service.delete(99L))
@@ -120,7 +120,7 @@ class DoctorServiceTest {
     }
 
     @Test
-    @DisplayName("Should Update doctor when doctor exist and data is valid")
+    @DisplayName("Should update doctor when doctor exists, is active and data is valid")
     void shouldUpdateDoctorWhenDoctorExistAndDataIsValid(){
 
         //ARRANGE
@@ -129,7 +129,7 @@ class DoctorServiceTest {
         data.setName("Dr. New Name");
         data.setPhone("71999999999");
         data.setSpecialty(Specialty.PEDIATRICS);
-        when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
+        when(doctorRepository.findByIdAndActiveTrue(1L)).thenReturn(Optional.of(doctor));
 
         //ACT
         DoctorResponseData result = service.update(1L, data);
@@ -149,14 +149,14 @@ class DoctorServiceTest {
     }
 
     @Test
-    @DisplayName("Should Update Only Provide Fields When Partial Data Is Given")
+    @DisplayName("Should update only provided fields when partial data is given")
     void shouldUpdateOnlyProvideFieldsWhenPartialDataIsGiven(){
 
         //ARRANGE
         Doctor doctor = new Doctor("Dr. Old Name 2", "old2@email.com", "71000000000", "CRM001", Specialty.PEDIATRICS);
         DoctorUpdateData data = new DoctorUpdateData();
         data.setName("Dr. New Name 2");
-        when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
+        when(doctorRepository.findByIdAndActiveTrue(1L)).thenReturn(Optional.of(doctor));
 
         //ACT
         DoctorResponseData result = service.update(1L, data);
@@ -173,14 +173,14 @@ class DoctorServiceTest {
     }
 
     @Test
-    @DisplayName("should Throw ResourceNotFoundException When Try Update Non Existent Doctor")
+    @DisplayName("Should Throw ResourceNotFoundException When Try Update Non Existent Doctor")
     void shouldThrowResourceNotFoundExceptionWhenTryUpdateNonExistentDoctor(){
 
         //ARRANGE
         DoctorUpdateData data = new DoctorUpdateData();
         data.setName("Nome Test");
         data.setPhone("718283947");
-        when(doctorRepository.findById(99L)).thenReturn(Optional.empty());
+        when(doctorRepository.findByIdAndActiveTrue(99L)).thenReturn(Optional.empty());
 
         //ACT & ASSERT
         assertThatThrownBy(() -> service.update(99L, data))
