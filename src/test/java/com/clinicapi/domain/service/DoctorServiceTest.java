@@ -173,7 +173,7 @@ class DoctorServiceTest {
     }
 
     @Test
-    @DisplayName("Should Throw ResourceNotFoundException When Try Update Non Existent Doctor")
+    @DisplayName("Should throw ResourceNotFoundException when trying to update non existent or inactive doctor")
     void shouldThrowResourceNotFoundExceptionWhenTryUpdateNonExistentDoctor(){
 
         //ARRANGE
