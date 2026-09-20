@@ -4,13 +4,10 @@ import com.clinicapi.domain.person.Person;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-import java.time.LocalDate;
-
 @Entity
 @Table(name = "patients")
 public class Patient extends Person {
     private String cpf;
-    private LocalDate dateOfBirth;
 
     public String getCpf() {
 
@@ -20,16 +17,6 @@ public class Patient extends Person {
     public void setCpf(String cpf) {
 
         this.cpf = cpf;
-    }
-
-    public LocalDate getDateOfBirth() {
-
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-
-        this.dateOfBirth = dateOfBirth;
     }
 
     public Patient(){
@@ -44,7 +31,6 @@ public class Patient extends Person {
     @Override
     public String toString() {
         return "Patient: " + getName() +
-                " | cpf: " + cpf +
-                " | dateOfBirth= " + dateOfBirth;
+                " | cpf: " + cpf;
     }
 }
