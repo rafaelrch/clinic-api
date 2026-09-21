@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: clinicapi_dev
+      POSTGRES_DB: clinicapi
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DATASOURCE_URL: jdbc:postgresql://db:5432/clinicapi
+      DB_PASSWORD: clinicapi_dev
+      JWT_SECRET: dev_secret_change_in_production
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
