@@ -11,21 +11,15 @@
 	<groupId>com.clinicapi</groupId>
 	<artifactId>clinic-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
-	<url/>
+	<name>clinic-api</name>
+	<description>REST API for managing a medical clinic</description>
+	<url>https://github.com/rafaelrch/clinic-api</url>
 	<licenses>
-		<license/>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+		</license>
 	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
 	<properties>
 		<java.version>21</java.version>
 		<testcontainers.version>1.20.4</testcontainers.version>
@@ -101,7 +95,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Spring Security Test - anotações tipo @WithMockUser pra testes autenticados -->
+		<!-- Spring Security Test - annotations such as @WithMockUser for authenticated tests -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
