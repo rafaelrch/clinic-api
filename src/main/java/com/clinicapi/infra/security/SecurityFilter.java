@@ -44,8 +44,8 @@ public class SecurityFilter extends OncePerRequestFilter {
 
                 UserDetails user = userRepository.findByLogin(subject);
 
-                // Token assinado corretamente, mas o usuário não existe mais no banco.
-                // Também é 401: a credencial não identifica ninguém válido.
+                // Token is correctly signed, but the user no longer exists in the database.
+                // Still a 401: the credential does not identify a valid user.
                 if (user == null) {
                     writeUnauthorized(request, response, "User not found for the provided token");
                     return;
@@ -56,7 +56,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
             } catch (JWTVerificationException e) {
                 writeUnauthorized(request, response, e.getMessage());
-                return; // encerra a requisição aqui: nada de doFilter
+                return; // stop the request here: do not call doFilter
             }
         }
 
@@ -85,8 +85,8 @@ public class SecurityFilter extends OncePerRequestFilter {
     private String recoverToken(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
 
-        // Sem header ou sem o prefixo correto: não há token a validar.
-        // A requisição segue sem autenticação e o SecurityConfig decide se ela passa.
+        // No header or wrong prefix: there is no token to validate.
+        // The request continues unauthenticated and SecurityConfig decides whether it is allowed.
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             return null;
         }

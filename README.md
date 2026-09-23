@@ -232,7 +232,7 @@ Validation failures list every invalid field:
 ./mvnw test
 ```
 
-41 tests, all running on every push through GitHub Actions.
+42 tests, all running on every push through GitHub Actions.
 
 | Test class | Tests | Scope |
 |---|---|---|
@@ -241,6 +241,7 @@ Validation failures list every invalid field:
 | `PatientServiceTest` | 8 | CRUD, partial updates |
 | `DoctorControllerTest` | 5 | HTTP status, JSON payloads and authorization per role |
 | `AppointmentTest` | 2 | Entity construction and initial status |
+| `RootControllerTest` | 1 | Root redirect to Swagger UI without authentication |
 | `ClinicApiApplicationTests` | 1 | Application context smoke test |
 
 Service tests are pure unit tests with Mockito, following the Arrange/Act/Assert pattern. They assert both the returned DTO and the state of the mutated entity, and use `verify(never())` to prove that nothing is saved or deleted when a rule fails. Controller tests use `@WebMvcTest` with the real `SecurityConfig` imported, so authorization is actually enforced in the test instead of being bypassed.

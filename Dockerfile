@@ -1,4 +1,4 @@
-#ESTAGIO 1
+# Stage 1: build
 
 FROM eclipse-temurin:21-jdk AS builder
 
@@ -15,7 +15,7 @@ COPY src src
 
 RUN ./mvnw clean package -DskipTests
 
-# ESTÁGIO 2
+# Stage 2: runtime
 
 FROM eclipse-temurin:21-jre
 

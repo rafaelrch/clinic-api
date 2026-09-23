@@ -16,7 +16,7 @@ public record DoctorResponseData(
         @Schema(description = "Doctor phone", example = "71999384756", accessMode = Schema.AccessMode.READ_ONLY)
         String phone,
 
-        @Schema(description = "Doctor CRM used", example = "Doctoralia", accessMode = Schema.AccessMode.READ_ONLY)
+        @Schema(description = "Doctor CRM registration number", example = "CRM-BA 12345", accessMode = Schema.AccessMode.READ_ONLY)
         String crm,
 
         @Schema(description = "Doctor specialty", example = "CARDIOLOGY", accessMode = Schema.AccessMode.READ_ONLY)
